@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>jQuery Start</title>
+  <script src="jquery.js"></script>
+  <script>
+    // HTML DOM 載入完成後，執行初始化程式
+    /*
+    $(document).ready(function(){
+      alert('jQuery Ready');
+    });
+    */
+   
+   /*
+   function change(){
+     // $就是一個function
+     // jQuery 選擇器 : 取得畫面中想要的標籤物件 (HTML Element)
+     // 回傳 jQuery 物件 :　包含所選到的標籤
+     let items = $('.item:nth-child(1)');
+     // 同時更改選到標籤的屬性
+     items.html('Hello World');
+     items.css({
+       color:"red",
+       fontWeight:'bold',
+      });
+      // items.fadeOut();
+      items.on('click', function(){
+        alert('hello');
+      });
+    }
+    */
+   // HTML DOM 載入完成後，執行初始化程式
+    window.addEventListener('load', function(){
+      // 點擊標籤的時候作用
+      $('.item').on('click', function(){
+        // 所有標籤變成一般的字體
+        $('.item').css({
+          fontWeight:'normal',
+          color:'black',
+        });
+        $('.content').hide();
+        // 點到的標籤變成粗體字
+        // this 在事件處裡函式中代表觸發事件的標籤
+        // 這式原生JS的Element;不是jQ包裝過的
+        /*
+        this.style.fontWeight="bold";
+        this.style.color="red";
+        */
+        // console.log($(this));
+        $(this).css({
+          fontWeight:'bold',
+          color:'red',
+        })
+        
+
+        // let index=$(this).attr('data-index');
+        let index = this.dataset.index;
+        console.log(index);
+        $('.content:nth-child('+index +')').fadeIn();
+        
+      })
+    })
+
+  </script>
+</head>
+<body>
+  <h3>Tag Menu</h3>
+  <div class="menu">
+    <span class="item" data-index="1" style="color:red; font-weight:bold">Item 1</span>
+    <span class="item" data-index="2">Item 2</span>
+    <span class="item" data-index="3">Item 3</span>
+  </div>
+  <hr/>
+  <div>
+    <div class="content">這是第一塊內容</div>
+    <div class="content" style="display:none;">這是第二塊內容</div>
+    <div class="content" style="display:none;">這是第三塊內容</div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Javascripts Review</title>
+  <script>
+    // 函式
+    /*
+    function test(){
+      alert('hello');
+    }
+    test();
+    
+    let test = function(){
+      alert('hello');
+    }
+    test();
+    // 匿名函式
+    (function(){
+      alert('hello');
+    })();
+    */
+    /*
+    function add(n1, n2){
+      // 非同步的程式;交給另外一個核心處理
+      window.setTimeout(function(){
+        alert('2');
+        return n1 + n2;
+      }, 2000)
+      // 主程式直接回傳 "Hello"
+      alert('1');
+      return 'hello';
+      // 就算不寫也會 return 在最後
+    }
+    let result = add(3,4);
+    console.log(result);
+    */
+    /*
+    // callback, promise, async await 作法練習
+    // 等待兩秒鐘後作加法，並且可以把結果"傳出來"繼續工作
+    function add(n1, n2, callback){
+      window.setTimeout(function(){
+        callback(n1 + n2);
+        // return n1 + n2; // 這邊是匿名函示的return
+      }, 2000)
+    }
+    // 回呼函示的設計與使用；透過參數傳遞函式
+    add( 3, 4, function(result){
+      console.log(result);
+      alert(result*2);
+    });
+    */
+    
+    
+    // Main cal function
+    function promiseAdd(n1, n2){
+      return new Promise(function(resolve, reject){
+        setTimeout(function(){
+          resolve(n1 + n2)
+        }, 2000)
+      })
+    }
+    
+    // Promise Way
+    promiseAdd(1, 2)
+      .then((result)=>promiseAdd(result, 3))
+      .then((finalResult)=>console.log(finalResult));
+    
+
+    // Async Way
+    async function asyncAdd(){
+      let firstResult = await promiseAdd(1, 2);
+      let finalResult = await promiseAdd(firstResult, 3);
+      return finalResult;
+    }
+    asyncAdd().then((result) => console.log(result));
+    
+
+    
+    /*
+    // 物件:利用 JSON Literal 建立物件
+    let obj = {
+      x:3,
+      y:4,
+      show:function(){
+        alert(this.x +', ' +this.y);
+      }
+    };
+    obj.z = 5;
+    console.log(obj)
+    console.log(obj.x + obj.y);
+    */
+    /*  
+      函式名稱 add: 兩秒鐘後取得加法結果
+          參數
+              args: 一個物件
+                n1:數字
+                n2:數字
+                callback:函式(result){}
+    */
+    /*
+    function add(args){
+      window.setTimeout(function(){
+        args.callback(args.n1 + args.n2);
+      }, 2000)
+    }
+    // 回呼函示的設計與使用；透過參數傳遞函式
+    // 在 jQuery 裡面這樣非常常見
+    add({
+      n1:3,
+      n2:4,
+      callback:function(result){
+        alert(result);
+      }
+    });
+    */
+    /*
+    add( 3, 4, function(result){
+      console.log(result);
+      alert(result*2);
+    });
+    */
+    
+  </script>
+</head>
+<body>
+  
+</body>
+</html>
