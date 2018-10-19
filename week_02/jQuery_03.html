@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>jQuery Side Menu</title>
+  <style>
+  .menu{
+    margin: 10px 0px;
+  }
+  .menu>.title{
+    font-weight: bold;
+  }
+  .menu>.items{
+    margin-left: 20px;
+  }
+  </style>
+  <script src="../week_01/jquery.js"></script>
+  <script>
+    // HTML DOM，載入後，立刻做程式的初始化
+    // window.addEventListener('load',function(){}); // 原生的寫法
+    // 包裝 document 物件後的 ready 事件 (jQuery的事件)
+    // 會忽略外部資源的載入時間 (例如圖片慢慢讀取，功能先出來)
+    $(document).ready(function(){
+      $('.menu>.title').on('click', function(){
+        // 原生寫法 this.nextSibling
+        $(this).next().slideToggle();
+      })
+    })
+  </script>
+</head>
+<body>
+  <h3>Side Menu</h3>
+  <div class="menu">
+    <div class="title">Group 1</div>
+    <div class="items" style="display:none;">
+      <div class="item">Item 2-1</div>
+      <div class="item">Item 2-2</div>
+    </div>
+  </div>
+  <div class="menu">
+    <div class="title">Group 2</div>
+    <div class="items" style="display:none;">
+      <div class="item">Item 2-1</div>
+      <div class="item">Item 2-2</div>
+    </div>
+  </div>
+</body>
+</html>

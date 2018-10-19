@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>jQuery Test</title>
+  <script src="../week_01/jquery.js"></script>
+  <script>
+    function test(){
+      /*
+      $(document).ready(function(){
+        alert('jQuery Ready');
+      });
+      */
+      // $(document.body).fadeOut();
+      /*
+      let divObj=document.querySelector('#content');
+      // $(divObj).fadeOut();
+      $('#content').fadeOut({
+        duration:2000,
+        complete:function(){
+          // $('#content').fadeIn(2000);
+          $(this).fadeIn(2000);
+        }
+      });
+      */
+      
+      $('#content').fadeOut({queue:true}); // 立刻加入列表，不需要等0.4秒
+      $('#content').fadeIn({queue:true});
+      console.log('End');
+      
+    }
+  </script>
+</head>
+<body>
+  <button onclick='test();'>TEST</button>
+  <div id='content'>Hello World</div>
+</body>
+</html>
