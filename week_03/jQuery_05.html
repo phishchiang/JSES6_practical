@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <style>
+  .title{
+    font-weight: bold;
+    font-size: 20px;
+    color: rgb(255, 238, 0);
+  }
+  </style>
+  <script src="../week_01/jquery.js"></script>
+  <!-- <script src="./chosen.jquery.min.js"></script> -->
+  
+  <script>
+    $(document).ready(function(){
+      console.log('works!');
+    })
+
+    function check(){
+      let jqInput = $("#input"); // input 是 jQuery 物件
+      console.log(jqInput.val()); // 一定要用jQuery的方法取得
+      let jqGender = $("#gender");
+      jqGender.val("female"); // 設定資料
+      console.log(jqGender.val()); // 取得資料
+      /*
+      // 原生JS寫法
+      let jsInput = document.querySelector('#input')
+      console.log(jsInput.value);
+      let jsGender = document.querySelector('#gender');
+      let jsValue = jsGender.options[jsGender.selectedIndex].value;
+      console.log(jsValue);
+      */
+    }
+    function change(){
+      // $('#title').css({fontWeight:"bold"})
+      $('#title').addClass('title'); // removeClass(), toggleClass()
+      let test = $('#title').next().html();
+      console.log(test);
+      $('#favorite>li').css({color:"#5b9fbf"});
+      let second = $('#favorite>li').eq(1);
+      second.css({
+        color:"#b720d6",
+        textDecoration:"underline"
+      });
+    }
+  </script>
+</head>
+<body>
+  <h3>關於屬性的操作</h3>
+  <div id="title">這是文章的標題</div>
+  <div>這是文章的內容</div>
+  <ul id="favorite">
+    <li>Google</li>
+    <li>Facebook</li>
+    <li>Instagram</li>
+  </ul>
+  <button onclick="change();">Click</button>
+  <h3>關於使用者的輸入</h3>
+  <input type="text" id="input"/>
+  <select id="gender">
+    <option value="">性别</option>
+    <option value="male">男性</option>
+    <option value="female">女性</option>
+  </select>
+  <button onclick="check();">Click</button>
+</body>
+</html>

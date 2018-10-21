@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Canvas</title>
+  <script>
+    let cvs, ctx;
+    window.addEventListener('load', function(){
+      cvs=document.querySelector('#cvs'); // 取得canvas物件
+      ctx=cvs.getContext('2d'); // 取得context物件，所有作畫的內容都在這個物件上
+      // 填滿; 具有順序性
+      ctx.fillRect(100, 100, 50, 50);
+      ctx.fillStyle='red';
+      ctx.fillText('Hello', 200, 100);
+      // 描邊
+      ctx.strokeStyle='blue';
+      ctx.strokeRect(400, 400, 50, 50);
+      // 建立路徑 : 定義路徑 > 畫出來
+      ctx.beginPath(); // 開始定義路徑
+      ctx.moveTo(400, 100); // 將控制點移動到 (400, 100) 的座標
+      ctx.lineTo(450, 150);
+      ctx.lineTo(400, 200);
+      // 描邊或是填滿
+      ctx.fill(); // ctx.stroke();
+      // 畫出圖片
+      // 圖片物件接受三種格式 : img標籤、另外一個canvas、video
+      let img = new Image(); // 相當於 <img/>
+      img.src="../week_02/img/0.jpg" // ../week_02/img/
+      // 等到圖片載入完成之後，會觸發一個load事件，才能畫出來
+      img.addEventListener('load', function(){
+        ctx.drawImage(img, 0, 0, cvs.width/2, cvs.height); 
+      })
+      // ctx.drawImage(img, 300, 300, 100, 100); // 圖片物件
+    });
+  </script>
+</head>
+<body>
+  <h3>Canvas</h3>
+  <canvas id="cvs" 
+    width="600" height="450"
+    style="border: 1px solid black"
+  ></canvas>
+</body>
+</html>
