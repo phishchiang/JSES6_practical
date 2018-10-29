@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Canvas</title>
+  <script>
+
+    let cvs, ctx;
+    window.addEventListener('load', function(){
+      cvs=document.querySelector('#cvs');
+      ctx=cvs.getContext('2d');
+    })
+    function openPicker(){
+      let input=document.querySelector('#file');
+      input.click();
+    }
+    function openFile(input){
+      let file=input.files[0]; // files 屬性是固定的，也可以多選
+      // URL.createObjectURL (檔案物件或 Blob 物件)
+      let src=URL.createObjectURL(file);
+      loadImage(src);
+    }
+    function loadImage(src){
+      // 把圖檔畫到畫布上
+      let img=new Image();
+      img.src=src;
+      img.addEventListener('load', function(){
+        // 根據載入的圖片尺寸來調整 canvas 的尺寸
+        cvs.width=img.width;
+        cvs.height=img.height;
+        ctx.drawImage(img, 0, 0, cvs.width, cvs.height);
+      });
+    }
+    function grayscale(){
+      // 取得　ImageData 物件
+      let pixels=ctx.getImageData(0, 0, cvs.width, cvs.height);
+      // 取得　ImageData 物件中的顏色資料
+      let data=pixels.data;
+      console.log(data);
+      // 以像素為單位來處理顏色:一次往前跳四個編號
+      let avg;
+      for(let i=0; i<data.length;i=i+4){
+        avg=(data[i]+data[i+1]+data[i+2])/3;
+        data[i+0]=avg; // R
+        data[i+1]=avg; // G
+        data[i+2]=avg; // B
+      }
+      // 因為是陣列的關係，所以data改了pixel.data也會一起跟著改
+      // pixels.data = data;
+      ctx.putImageData(pixels, 0, 0);
+    }
+    function invert(){
+      let pixels=ctx.getImageData(0, 0, cvs.width, cvs.height);
+      let data=pixels.data;
+      console.log(data);
+      for(let i=0; i<data.length;i=i+4){
+        data[i+0]=255-data[i+0]; // R
+        data[i+1]=255-data[i+1]; // G
+        data[i+2]=255-data[i+2]; // B
+      }
+      ctx.putImageData(pixels, 0, 0);
+    }
+    function downloadFile(){
+      // 把畫布的資料轉換成 Blob 物件：JavaScript　內部用來儲存二進位資料的物件，不是文字的資料
+      cvs.toBlob(function(blob){ // 透過　callback　函式傳遞轉換好的 Blob 物件，非同步的方式
+        // 取得　Blob 資料的後續動作
+        let src=URL.createObjectURL(blob);
+        // 設定好下載的資訊，並觸發下載的動作
+        let link=document.querySelector('#download-link');
+        link.href=src;
+        link.download="image.jpg";
+        link.click();
+      }, "image/jpeg");
+    }
+    
+    // 以下和 Google Drive 相關的程式，測試的時候一定要用localhost不能用127.0.....
+    let API_KEY = 'AIzaSyCO5wth2TptoP49IXVPlIcZmklaDX-9d3g';
+    let CLIENT_ID = '625164338666-1i7hhlj2ltj4a8f98ts017to3l5nihms.apps.googleusercontent.com';
+    // 決定授權的範圍，範例檔提供的太小了，需要調整
+    // https://www.googleapis.com/auth/drive      完整授權適合開發
+    // https://www.googleapis.com/auth/drive.file 這個比較適合一般人能接受的
+    let SCOPES = 'https://www.googleapis.com/auth/drive';
+
+    function handleClientLoad() {
+      gapi.load('client:auth2', initClient);
+    }
+
+    function initClient() { // 只有一個動作，做初始化 client 端
+      gapi.client.init({
+        apiKey: API_KEY,
+        clientId: CLIENT_ID,
+        scope: SCOPES // 你希望使用者要求授權的使用範圍，要求越多使用者越擔心
+      }).then(function () {
+        // updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
+        document.querySelector('#drive-btn').disabled=false;
+      });
+    }
+
+    function openDriveFile(){
+      // gapi.auth2.getAuthInstance().isSignedIn.get() 這個可以看是否使用者登入
+      let signedIn=gapi.auth2.getAuthInstance().isSignedIn.get();
+      console.log(signedIn);
+      
+      if(signedIn){
+        // 打開雲端硬碟的檔案
+        console.log('打開檔案')
+      }else{
+        // 要求使用者登入
+        console.log('請登入');
+        gapi.auth2.getAuthInstance().signIn();
+      }
+    }
+
+
+  </script>
+  <script async defer src="https://apis.google.com/js/api.js" 
+    onload="this.onload=function(){};handleClientLoad()"
+    onreadystatechange="if (this.readyState === 'complete') this.onload()">
+  </script>
+</head>
+<body>
+  <h3>My Canvas</h3>
+  <!-- input 太難看，所以用button美化 -->
+  <button onclick="openPicker();">Open File</button>
+  <input id="file" type="file" onchange="openFile(this);" style="display:none"/>
+  <button onclick="grayscale();">Grayscale</button>
+  <button onclick="invert();">Invert</button>
+  <button onclick="downloadFile();">Download</button>
+  <button id="drive-btn" onclick="openDriveFile();" disabled="true">Open File From GDrive</button>
+  <a id="download-link"></a>
+  <!-- 利用 <a/> 去做下載的動作 -->
+  <!-- <a download="下載的檔名" href="檔案的網址">Image</a> -->
+  <hr/>
+  <canvas id="cvs"
+  width="600" height="450"
+  style="border: 1px solid #000000"></canvas>
+</body>
+</html>

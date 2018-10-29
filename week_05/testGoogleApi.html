@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Drive API Quickstart</title>
+    <meta charset="utf-8" />
+  </head>
+  <body>
+    <p>Drive API Quickstart</p>
+
+    <!--Add buttons to initiate auth sequence and sign out-->
+    <button id="authorize_button" style="display: none;">Authorize</button>
+    <button id="signout_button" style="display: none;">Sign Out</button>
+
+    <pre id="content"></pre>
+
+    <script type="text/javascript">
+      // Client ID and API key from the Developer Console
+      var CLIENT_ID = '625164338666-1i7hhlj2ltj4a8f98ts017to3l5nihms.apps.googleusercontent.com';
+      var API_KEY = 'AIzaSyCO5wth2TptoP49IXVPlIcZmklaDX-9d3g';
+
+      // Array of API discovery doc URLs for APIs used by the quickstart
+      var DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"];
+
+      // Authorization scopes required by the API; multiple scopes can be
+      // included, separated by spaces.
+      // 輕微的授權 只能讀 metadata
+      var SCOPES = 'https://www.googleapis.com/auth/drive';
+
+      var authorizeButton = document.getElementById('authorize_button');
+      var signoutButton = document.getElementById('signout_button');
+
+      /**
+       *  On load, called to load the auth2 library and API client library.
+       */
+      function handleClientLoad() {
+        // 這邊再來載入另外一個套件 OAUTH 2.0，之後 initClient 是下一動
+        gapi.load('client:auth2', initClient);
+      }
+
+      /**
+       *  Initializes the API client library and sets up sign-in state
+       *  listeners.
+       */
+      function initClient() { // 只有一個動作，做初始化 client 端
+        // 初始化:提供必要的資訊，同時偵測使用者是否已經授權，問 GOOGLE 是不是使用者有授權給我們
+        gapi.client.init({
+          apiKey: API_KEY,
+          clientId: CLIENT_ID,
+          discoveryDocs: DISCOVERY_DOCS,
+          scope: SCOPES // 你希望使用者要求授權的使用範圍，要求越多使用者越擔心
+        }).then(function () {
+          // 初始化完成，取得使用者的授權狀態
+          
+          // Handle the initial sign-in state.
+          // 根據使用者的授權狀態，做一些處理，最後會得到 true or false
+          updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
+          authorizeButton.onclick = handleAuthClick;
+          signoutButton.onclick = handleSignoutClick;
+
+          // Listen for sign-in state changes.
+          // 若是授權狀態感變，主動呼叫 updateSigninStatus 函式
+          // 事件註冊，未來如果有變化的話，會再跑一次
+          gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus);
+        });
+      }
+
+      /**
+       *  Called when the signed in status changes, to update the UI
+       *  appropriately. After a sign-in, the API is called.
+       */
+      function updateSigninStatus(isSignedIn) {
+        // 根據使用者是否登入而做一些事
+        if (isSignedIn) { // 已授權 / 登入
+          authorizeButton.style.display = 'none';
+          signoutButton.style.display = 'block';
+          listFiles(); // 取得使用者的檔案資料 : Google drive 的 API 一定要登入後才能呼叫
+        } else { // 未授權 / 未登錄
+          authorizeButton.style.display = 'block';
+          signoutButton.style.display = 'none';
+        }
+      }
+
+      /**
+       *  Sign in the user upon button click.
+       */
+      function handleAuthClick(event) {
+        // 使用者登入，跳出登入的視窗
+        gapi.auth2.getAuthInstance().signIn();
+        // 按下允許的話，授權狀態改變，偵測狀態改變，所以畫面改變
+      }
+
+      /**
+       *  Sign out the user upon button click.
+       */
+      function handleSignoutClick(event) {
+        gapi.auth2.getAuthInstance().signOut();
+      }
+
+      /**
+       * Append a pre element to the body containing the given message
+       * as its text node. Used to display the results of the API call.
+       *
+       * @param {string} message Text to be placed in pre element.
+       */
+      function appendPre(message) {
+        var pre = document.getElementById('content');
+        var textContent = document.createTextNode(message + '\n');
+        pre.appendChild(textContent);
+      }
+
+      /**
+       * Print files.
+       */
+      function listFiles() {
+        gapi.client.drive.files.list({
+          'pageSize': 10,
+          'fields': "nextPageToken, files(id, name)"
+        }).then(function(response) {
+          appendPre('Files:');
+          var files = response.result.files;
+          if (files && files.length > 0) {
+            for (var i = 0; i < files.length; i++) {
+              var file = files[i];
+              appendPre(file.name + ' (' + file.id + ')');
+            }
+          } else {
+            appendPre('No files found.');
+          }
+        });
+      }
+
+    </script>
+<!-- 程式的進入點 handleClientLoad 從這邊開始，這邊先載入一個loader -->
+    <script async defer src="https://apis.google.com/js/api.js" 
+      onload="this.onload=function(){};handleClientLoad()"
+      onreadystatechange="if (this.readyState === 'complete') this.onload()">
+    </script>
+  </body>
+</html>
