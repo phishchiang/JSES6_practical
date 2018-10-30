@@ -84,10 +84,12 @@
     let SCOPES = 'https://www.googleapis.com/auth/drive';
 
     function handleClientLoad() {
+      // 這邊再來載入另外一個套件 OAUTH 2.0，之後 initClient 是下一動
       gapi.load('client:auth2', initClient);
     }
 
     function initClient() { // 只有一個動作，做初始化 client 端
+      // 初始化:提供必要的資訊，同時偵測使用者是否已經授權，問 GOOGLE 是不是使用者有授權給我們
       gapi.client.init({
         apiKey: API_KEY,
         clientId: CLIENT_ID,
@@ -115,6 +117,7 @@
 
 
   </script>
+  <!-- 這邊先載入一個loader，之後馬上執行handleClientLoad() -->
   <script async defer src="https://apis.google.com/js/api.js" 
     onload="this.onload=function(){};handleClientLoad()"
     onreadystatechange="if (this.readyState === 'complete') this.onload()">

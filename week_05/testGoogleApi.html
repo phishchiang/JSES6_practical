@@ -53,6 +53,7 @@
           
           // Handle the initial sign-in state.
           // 根據使用者的授權狀態，做一些處理，最後會得到 true or false
+          // gapi.auth2.getAuthInstance().isSignedIn.get() 這個可以看是否使用者登入
           updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
           authorizeButton.onclick = handleAuthClick;
           signoutButton.onclick = handleSignoutClick;
