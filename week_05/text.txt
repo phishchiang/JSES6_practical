@@ -5,6 +5,8 @@
     https://developers.google.com/
     Google Drive APIs > Quickstarts:
     https://developers.google.com/drive/api/v3/quickstart/js
+    如果授權完後想要取消，去 Google Account 修改 :
+    https://myaccount.google.com/
 2. 啟用 API
 3. 建立憑證 (API 金鑰、OAuth 2.0 用戶端) 用戶端視是開發人員;服務端是 Google
     已授權的JavaScript來源不能寫127.0...而是要寫localhost
