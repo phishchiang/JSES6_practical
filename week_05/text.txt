@@ -19,3 +19,24 @@
 
 => 已授權 : 開始需要抓取使用者資料的程式
 => 未授權 : 鼓勵使用者授權 (登入)
+
+RESTful API
+不是引入的 類似jQuery
+提供API的形式 是像網址
+跨語言的限制，比起傳統的API跟CDN而言
+List :
+https://developers.google.com/drive/api/v3/reference/files/list
+Standard Query Parameters :
+https://developers.google.com/drive/api/v3/query-parameters
+
+Guide > Manage Files and folders > Download Files : 
+https://developers.google.com/drive/api/v3/manage-downloads
+
+Google File API
+https://developers.google.com/drive/api/v3/picker
+
+Test Drive photo metadata:
+id: "172LTO4nMQ1uPS0pUZbiwEGURsp2RhmLmjg"
+kind: "drive#file"
+mimeType: "image/jpeg"
+name: "IMG_20181030_172714.jpg

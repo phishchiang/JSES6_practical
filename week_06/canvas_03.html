@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Canvas</title>
+  <script>
+
+    let cvs, ctx;
+    window.addEventListener('load', function(){
+      cvs=document.querySelector('#cvs');
+      ctx=cvs.getContext('2d');
+    })
+    function openPicker(){
+      let input=document.querySelector('#file');
+      input.click();
+    }
+    function openFile(input){
+      let file=input.files[0]; // files 屬性是固定的，也可以多選
+      // URL.createObjectURL (檔案物件或 Blob 物件)
+      let src=URL.createObjectURL(file);
+      loadImage(src);
+    }
+    function loadImage(src){
+      // 把圖檔畫到畫布上
+      let img=new Image();
+      img.src=src;
+      img.addEventListener('load', function(){
+        // 根據載入的圖片尺寸來調整 canvas 的尺寸
+        cvs.width=img.width;
+        cvs.height=img.height;
+        ctx.drawImage(img, 0, 0, cvs.width, cvs.height);
+      });
+    }
+    function grayscale(){
+      // 取得　ImageData 物件
+      let pixels=ctx.getImageData(0, 0, cvs.width, cvs.height);
+      // 取得　ImageData 物件中的顏色資料
+      let data=pixels.data;
+      console.log(data);
+      // 以像素為單位來處理顏色:一次往前跳四個編號
+      let avg;
+      for(let i=0; i<data.length;i=i+4){
+        avg=(data[i]+data[i+1]+data[i+2])/3;
+        data[i+0]=avg; // R
+        data[i+1]=avg; // G
+        data[i+2]=avg; // B
+      }
+      // 因為是陣列的關係，所以data改了pixel.data也會一起跟著改
+      // pixels.data = data;
+      ctx.putImageData(pixels, 0, 0);
+    }
+    function invert(){
+      let pixels=ctx.getImageData(0, 0, cvs.width, cvs.height);
+      let data=pixels.data;
+      console.log(data);
+      for(let i=0; i<data.length;i=i+4){
+        data[i+0]=255-data[i+0]; // R
+        data[i+1]=255-data[i+1]; // G
+        data[i+2]=255-data[i+2]; // B
+      }
+      ctx.putImageData(pixels, 0, 0);
+    }
+    function downloadFile(){
+      // 把畫布的資料轉換成 Blob 物件：JavaScript　內部用來儲存二進位資料的物件，不是文字的資料
+      cvs.toBlob(function(blob){ // 透過　callback　函式傳遞轉換好的 Blob 物件，非同步的方式
+        // 取得　Blob 資料的後續動作
+        let src=URL.createObjectURL(blob);
+        // 設定好下載的資訊，並觸發下載的動作
+        let link=document.querySelector('#download-link');
+        link.href=src;
+        link.download="image.jpg";
+        link.click();
+      }, "image/jpeg");
+    }
+    
+    // 以下和 Google Drive 相關的程式，測試的時候一定要用localhost不能用127.0.....
+    let API_KEY = 'AIzaSyCO5wth2TptoP49IXVPlIcZmklaDX-9d3g';
+    let CLIENT_ID = '625164338666-1i7hhlj2ltj4a8f98ts017to3l5nihms.apps.googleusercontent.com';
+    // 決定授權的範圍，範例檔提供的太小了，需要調整
+    // https://www.googleapis.com/auth/drive      完整授權適合開發
+    // https://www.googleapis.com/auth/drive.file 這個比較適合一般人能接受的
+    let SCOPES = 'https://www.googleapis.com/auth/drive';
+
+    function handleClientLoad() {
+      // 這邊再來載入另外一個套件 OAUTH 2.0，之後 initClient 是下一動
+      gapi.load('client:auth2', initClient);
+      // 載入 Google File Picker
+      gapi.load('picker');
+    }
+
+    function initClient() { // 只有一個動作，做初始化 client 端
+      // 初始化:提供必要的資訊，同時偵測使用者是否已經授權，問 GOOGLE 是不是使用者有授權給我們
+      gapi.client.init({
+        apiKey: API_KEY,
+        clientId: CLIENT_ID,
+        scope: SCOPES // 你希望使用者要求授權的使用範圍，要求越多使用者越擔心
+      }).then(function () {
+        // updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
+        document.querySelector('#drive-btn').disabled=false;
+      });
+    }
+
+    function openDriveFile(){
+      // gapi.auth2.getAuthInstance().isSignedIn.get() 這個可以看是否使用者登入
+      let signedIn=gapi.auth2.getAuthInstance().isSignedIn.get();
+      console.log(signedIn);
+      
+      if(signedIn){
+        // 打開雲端硬碟的檔案
+        console.log('打開檔案')
+        openDrivePicker();
+      }else{
+        // 要求使用者登入
+        console.log('請登入');
+        gapi.auth2.getAuthInstance().signIn();
+      }
+    }
+
+    function openDriveFile(){
+      // 取得 Access Token
+      let auth = gapi.auth2.getAuthInstance();
+      let accessToken = auth.currentUser.get().getAuthResponse().access_token;
+      // 準備建立 Google Picker
+      let view = new google.picker.View(google.picker.ViewId.DOCS);
+      view.setMimeTypes("image/png,image/jpeg,image/jpg");
+      let picker = new google.picker.PickerBuilder()
+          .enableFeature(google.picker.Feature.NAV_HIDDEN)
+          .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
+          .setAppId('625164338666') // 專案編號
+          .setOAuthToken(accessToken)
+          .addView(view)
+          .addView(new google.picker.DocsUploadView())
+          .setDeveloperKey(API_KEY)
+          .setCallback(pickerCallback) // 這邊是接下來的動作，使用一個 callback
+          .build();
+        picker.setVisible(true);
+    }
+    // A simple callback implementation.
+    function pickerCallback(data) { // 觀察使用者的動作
+      // console.log(data);
+      // 如果使用者選了一個檔案，抓出檔案的ID
+      // 確認使用者是做選擇的動作
+      if (data.action == google.picker.Action.PICKED) {
+        let fileId = data.docs[0].id;
+        getFile(fileId);
+        // alert('The user selected: ' + fileId);
+      }
+      
+    }
+    // 測試圖片資料 id: "172LTO4nMQ1uPS0pUZbiwEGURsp2RhmLmjg"
+    function getFile(fileId){
+      let auth = gapi.auth2.getAuthInstance();
+      let accessToken = auth.currentUser.get().getAuthResponse().access_token;
+      let req=new XMLHttpRequest();
+      req.responseType='arraybuffer'; // 先設定好回傳回來的資料型態，這東西可以裝二進位的資料
+      req.open('GET', 'https://www.googleapis.com/drive/v3/files/'+fileId+'?alt=media&access_token='+accessToken); // 後面加入 alt=media 來下載真正的檔案,二進位的資料
+      req.addEventListener('load', function(){
+        // let data = JSON.parse(req.responseText);
+        console.log(req.response); // 取得 ArrayBuffer 物件，不是用 responseText
+        // 網址=URL.createObjectURL(File 物件或是 Blob 物件);
+        // loadImage(網址);
+        let blob=new Blob([req.response]); // 產生一個 Blob 物件，參數的地方可以接受 ArrayBuffer
+        let src=URL.createObjectURL(blob);
+        loadImage(src);
+
+      });
+      req.send();
+    }
+    function listFile(){
+      // 用 GET 方法連線到 https://www.googleapis.com/drive/v3/files
+      // 連線時必須帶上 Access Token，這東西來自於授權程序
+      let auth = gapi.auth2.getAuthInstance();
+      let accessToken = auth.currentUser.get().getAuthResponse().access_token;
+      // alert(accessToken);
+      let req=new XMLHttpRequest();
+      req.open('GET', 'https://www.googleapis.com/drive/v3/files?pageSize=10&access_token='+accessToken); 
+      // 後面加入 ?access_token='+accessToken
+      // & 連結其他參數
+      req.addEventListener('load', function(){
+        // 連線完成，取得伺服器回應
+        // console.log(req.responseText); // 原始的資料是字串刑事
+        let data = JSON.parse(req.responseText);
+        // console.log(data);
+        // 先抓到檔案的 id ，在利用他去把檔案抓下來
+        for(let i=0; i<data.files.length; i++){
+          console.log(data.files[i].id);
+        }
+      });
+      req.send();
+    }
+
+
+  </script>
+  <!-- 這邊先載入一個loader，之後馬上執行handleClientLoad() -->
+  <script async defer src="https://apis.google.com/js/api.js" 
+    onload="this.onload=function(){};handleClientLoad()"
+    onreadystatechange="if (this.readyState === 'complete') this.onload()">
+  </script>
+</head>
+<body>
+  <h3>My Canvas</h3>
+  <!-- input 太難看，所以用button美化 -->
+  <button onclick="openPicker();">Open File</button>
+  <input id="file" type="file" onchange="openFile(this);" style="display:none"/>
+  <button onclick="grayscale();">Grayscale</button>
+  <button onclick="invert();">Invert</button>
+  <button onclick="downloadFile();">Download</button>
+  <button id="drive-btn" onclick="openDriveFile();" disabled="true">Open File From GDrive</button>
+  <a id="download-link"></a>
+  <!-- 利用 <a/> 去做下載的動作 -->
+  <!-- <a download="下載的檔名" href="檔案的網址">Image</a> -->
+  <hr/>
+  <canvas id="cvs"
+  width="600" height="450"
+  style="border: 1px solid #000000"></canvas>
+</body>
+</html>
