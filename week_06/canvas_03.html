@@ -126,8 +126,9 @@
       let view = new google.picker.View(google.picker.ViewId.DOCS);
       view.setMimeTypes("image/png,image/jpeg,image/jpg");
       let picker = new google.picker.PickerBuilder()
-          .enableFeature(google.picker.Feature.NAV_HIDDEN)
-          .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
+          // .enableFeature(google.picker.Feature.NAV_HIDDEN) // 瀏覽 Bar
+          .enableFeature(google.picker.Feature.SIMPLE_UPLOAD_ENABLED) // 上傳的功能
+          // .enableFeature(google.picker.Feature.MULTISELECT_ENABLED) // 不需要多選
           .setAppId('625164338666') // 專案編號
           .setOAuthToken(accessToken)
           .addView(view)
