@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Canvas</title>
+  <script>
+    let cvs, ctx;
+    let x1;
+    let x2, y2;
+    window.addEventListener('load', function(){
+      cvs = document.querySelector('#cvs');
+      ctx = cvs.getContext('2d');
+      // ctx.fillRect(100, 100, 20, 20);
+      x1=100;
+      x2=100; y2=100;
+      window.setInterval(refresh, 10);
+    });
+    function refresh(){
+      // 更新資料
+      x1++;
+      x2++; y2++;
+      // 清空畫面
+      ctx.clearRect(0, 0, cvs.width, cvs.height);
+      // 重畫
+      ctx.fillRect(x1, 100, 20, 20);
+      ctx.fillRect(x2, y2, 20, 20);
+    }
+  </script>
+</head>
+<body>
+  <h3>Game</h3>
+  <canvas id="cvs" width="600" height="450" style="border: 1px solid black"></canvas>
+</body>
+</html>

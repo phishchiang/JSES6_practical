@@ -40,3 +40,6 @@ id: "172LTO4nMQ1uPS0pUZbiwEGURsp2RhmLmjg"
 kind: "drive#file"
 mimeType: "image/jpeg"
 name: "IMG_20181030_172714.jpg
+
+Guide >  Manage Files and folders > Upload files > Multipart uploads :
+https://developers.google.com/drive/api/v3/multipart-upload
