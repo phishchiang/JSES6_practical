@@ -231,6 +231,7 @@
       let accessToken = auth.currentUser.get().getAuthResponse().access_token;
       // 準備 Multipart Body 的 http protocol 
       // \r\n 不管作業系統這是換行
+      /*
       let body = "--foo_bar_baz\r\n"+
         "Content-Type: application/json; charset=UTF-8\r\n\r\n"+
         "{\"name\":\"test.jpg\"}\r\n\r\n"+ // {"name": "test.jpg"} 換兩行
@@ -239,6 +240,22 @@
         "Content-Transfer-Encoding: base64\r\n\r\n"+
         data+"\r\n"+
         "--foo_bar_baz--";
+        */
+      let body = `
+        --foo_bar_baz
+        Content-Type: application/json; charset=UTF-8
+
+        {
+          "name":"test.jpg"
+        }
+        
+        --foo_bar_baz
+        Content-Type: image/jpeg
+        "Content-Transfer-Encoding: base64
+
+        ${data}
+        --foo_bar_baz--
+        `
       // 準備上傳檔案
       let req = new XMLHttpRequest();
       // uploadType=media& > simple upload
@@ -268,7 +285,7 @@
   <button onclick="invert();">Invert</button>
   <button onclick="downloadFile();">Download</button>
   <button id="drive-btn" onclick="openDriveFile();" disabled="true">Open File From GDrive</button>
-  <button onclick="saveDriveFile();">Save to Google Drive</button>
+  <button onclick="saveNewDriveFile();">Save to Google Drive</button>
   <a id="download-link"></a>
   <!-- 利用 <a/> 去做下載的動作 -->
   <!-- <a download="下載的檔名" href="檔案的網址">Image</a> -->

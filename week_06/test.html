@@ -14,7 +14,25 @@
     callback();
   }
 
-  efg(abc);
+  let dataArray
+  let req=new XMLHttpRequest();
+  // https://data.taipei/opendata/datalist/apiAccess?scope=datasetMetadataSearch&q=id:961ca397-4a59-45e8-b312-697f26b059dc
+  // https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=190796c8-7c56-42e0-8068-39242b8ec927
+  let taipeiDataLink = 'https://data.taipei/opendata/datalist/apiAccess?';
+  // req.responseType='arraybuffer'; // 先設定好回傳回來的資料型態，這東西可以裝二進位的資料
+  // req.open('GET', taipeiDataLink+'scope=resourceAquire&rid=190796c8-7c56-42e0-8068-39242b8ec927&limit=3&sort=metadata_created desc');
+  req.open('GET', taipeiDataLink+'scope=resourceAquire&rid=190796c8-7c56-42e0-8068-39242b8ec927&limit=10&sort=metadata_created desc');
+  req.addEventListener('load', function(){
+    let data = JSON.parse(req.responseText);
+    dataArray = data.result.results
+    // console.log(dataArray); 
+    let newArray = dataArray.map((item)=>{
+      return `${item.code_name} 的水質ph為 ${item.qua_ph}`
+    })
+    console.log(newArray); 
+
+  });
+  req.send();
   </script>
 </head>
 <body>
