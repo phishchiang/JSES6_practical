@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Smoke</title>
+  <script>
+    // 基本元件
+    let cvs, ctx; 
+    // 外部資源
+    let smoke;
+    // 遊戲裡面會變動的資料
+    let rs;
+    // let startX, startY;
+    window.addEventListener('load', function(){
+      cvs = document.querySelector('#cvs');
+      ctx = cvs.getContext('2d');
+      smoke = new Image();
+      smoke.src = "./training99/smoke.png";
+      smoke.addEventListener('load', function(){
+        // 外部資源載入完成後，才啟動遊戲
+        rs = [new SmokeSystem(), new SmokeSystem()];
+        startX = cvs.width/2;
+        startY = cvs.height-50;
+        window.setInterval(refresh, 10);
+      });
+    });
+
+    function refresh(){ // 盡量在主程式保持乾淨，不要作太特定
+      // startX = (startX +0.5)%cvs.width; //利用 mode 循環
+      // rs.push(new Smoke(startX, startY));
+      // 更新資料
+      let dead;
+      for(let i=0;i<rs.length; i++){
+        rs[i].update();
+        dead = rs[i].update();
+        if(dead){
+          rs.splice(i, 1);
+          i--; // 刪掉之後，為了要保持原來的 index 值
+        }
+      }
+      // 清空畫面
+      ctx.clearRect(0, 0, cvs.width, cvs.height);
+      // 重畫
+      for(let i=0;i<rs.length; i++){
+        rs[i].draw();
+      }
+    }
+    function SmokeSystem(){
+      this.x = Math.random()*cvs.width;
+      this.y = cvs.height-50;
+      this.smokes = []; // 把整個 smoke 物件放進去，
+      this.update = function(){
+        this.x=(this.x+0.5)%cvs.width;
+        this.smokes.push(new Smoke(this.x, this.y));
+        for(let i =0; i<this.smokes.length; i++){
+          if(this.smokes[i].update()){
+            this.smokes.splice(i, 1);
+            i--;
+          }
+        }
+      }
+      this.draw=function(){
+        for(let i =0; i<this.smokes.length; i++){
+          this.smokes[i].draw();
+        }
+      }
+    }
+    function Smoke(x, y){
+      this.x = x;
+      this.y = y;
+      this.vx = Math.random()*0.4-0.2; // -0.2 ~ 0.2
+      this.vy = Math.random()*0.5-1; // -0.5 ~ -1
+      this.alpha = 1;
+      this.size = 10;
+      // this.life 初期為0，隨時間+1
+      this.life = 1;
+
+      this.update = function(){
+        this.x+=this.vx;
+        this.y+=this.vy;
+        this.size+=0.2;
+        // this.life++;
+        if(this.alpha>0.003){
+          this.alpha-=0.003;
+        }
+        return this.y < 0; 
+      };
+      this.draw = function(){
+        // 儲存當前(或是之前)的繪圖設定
+        ctx.save();
+        ctx.globalAlpha = this.alpha;
+        ctx.drawImage(smoke, this.x-this.size/2, this.y-this.size/2, this.size, this.size); // 圖片載入必須要事先處理，不能這邊才載入
+        
+        // 取回前一次儲存的設定，之後再還原原本的設定
+        ctx.restore();
+        
+      };
+
+    }
+    // 類別
+    function Rect(){
+      // 初始化資料
+      this.x=100;
+      this.y=100;
+      this.vx=1;
+      this.vy=Math.random()*1;
+
+      this.update = function(){
+        this.x = this.x + this.vx;
+        this.y = this.y + this.vy;
+        // 每一個物件自己回報，回傳一個布林值，告訴主程式這個物件是否已經可以刪除
+        return this.x>cvs.width || this.y>cvs.height;
+      };
+      this.draw = function(){
+        ctx.fillRect(this.x, this.y, 2, 2);
+      };
+    }
+  </script>
+</head>
+<body>
+  <h3>Game</h3>
+  <canvas id="cvs" width="600" height="450" style="border: 1px solid black"></canvas>
+</body>
+</html>

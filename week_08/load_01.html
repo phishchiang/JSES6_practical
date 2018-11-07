@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Load Resource</title>
+  <script>
+    let cvs, ctx; 
+    window.addEventListener('load', function(){
+      cvs = document.querySelector('#cvs');
+      ctx = cvs.getContext('2d');
+      loadResources();
+    });
+    /*
+      callback
+      promise
+      async/await
+    */
+    function loadResources(){
+      loadImage('./training99/smoke.png')
+      .then(function(){
+        return loadImage('./training99/explosion.png');
+      }).then(function(){
+        return loadImage('./training99/plane.png');
+      }).then(()=>{
+        console.log('Start Game');
+      });
+    };
+    /*
+    function loadImage(src){
+      let img = new Image();
+      img.src = src;
+      img.addEventListener('load', function(){
+        console.log(src, 'Loaded');
+      });
+    };
+    */
+    function loadImage(src){
+      // 建立 Promise
+      let promise = new Promise (function(resolve, reject){
+        let img = new Image();
+        img.src = src;
+        img.addEventListener('load', function(){
+          console.log(src, 'Loaded');
+          resolve(); // 可以不傳資料
+        });
+      })
+      // 回傳 Promise
+      return promise;
+    };
+
+    /*
+      new Promise(要執行的函式(成功函式,失敗函式){
+        做要做的事情:
+          如果成功，呼叫 成功函式(資料),接到 then (繼續處理的函式)
+          如果失敗，呼叫 失敗函式(資料),接到 catch (繼續處理的函式)
+      })
+    */
+    /*
+    function test(){
+      let promise = new Promise (function(resolve, reject){
+        window.setTimeout(function(){
+          let x=3;
+          resolve(x);
+        }, 2000)
+      });
+      return promise;
+    }
+    test().then((result)=>{
+      console.log(result);
+      // return 另外一個 Promise
+      return test();
+    }).then((result)=>{
+      console.log(result);
+    });
+    */
+  </script>
+</head>
+<body>
+  <h3>Game</h3>
+  <canvas id="cvs" width="600" height="450" style="border: 1px solid black"></canvas>
+</body>
+</html>

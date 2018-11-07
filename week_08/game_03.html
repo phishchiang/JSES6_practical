@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Game</title>
+  <script>
+    let cvs, ctx;
+    // let r1, r2;
+    let rs;
+    window.addEventListener('load', function(){
+      cvs = document.querySelector('#cvs');
+      ctx = cvs.getContext('2d');
+      rs = [];
+      window.setInterval(refresh, 10);
+    });
+
+    function refresh(){
+      rs.push(new Rect());
+      // 更新資料
+      let dead;
+      for(let i=0;i<rs.length; i++){
+        rs[i].update();
+        dead = rs[i].update();
+        if(dead){
+          rs.splice(i, 1);
+          i--; // 刪掉之後，為了要保持原來的 index 值
+        }
+      }
+      // 清空畫面
+      ctx.clearRect(0, 0, cvs.width, cvs.height);
+      // 重畫
+      for(let i=0;i<rs.length; i++){
+        rs[i].draw();
+      }
+    }
+    // 類別
+    function Rect(){
+      // 初始化資料
+      this.x=100;
+      this.y=100;
+      this.vx=1;
+      this.vy=Math.random()*1;
+
+      this.update = function(){
+        this.x = this.x + this.vx;
+        this.y = this.y + this.vy;
+        // 每一個物件自己回報，回傳一個布林值，告訴主程式這個物件是否已經可以刪除
+        return this.x>cvs.width || this.y>cvs.height;
+      };
+      this.draw = function(){
+        ctx.fillRect(this.x, this.y, 2, 2);
+      };
+    }
+  </script>
+</head>
+<body>
+  <h3>Game</h3>
+  <canvas id="cvs" width="600" height="450" style="border: 1px solid black"></canvas>
+</body>
+</html>
