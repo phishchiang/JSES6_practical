@@ -6,7 +6,6 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>JS CallBack, Promise and Async/Await</title>
   <script>
-    
     // Promise, Async/Await 的主程式
     function add(n1, n2){
       let promise = new Promise(function(resolve, reject){
@@ -27,7 +26,6 @@
       console.log(await finalResult);
     }
     asyncFunc();
-
     
     // Promise Way
     add(2, 2).then(function(result){
@@ -40,24 +38,21 @@
       });
     });
     
-
-    /*
     // CallBack
-    function add(n1, n2, callback){
+    function addCb(n1, n2, callback){
       window.setTimeout(function(){
         callback(n1 + n2);
       }, 2000)
     }
-    add(2, 2, function(result){
+    addCb(2, 2, function(result){
       console.log(result);
-      add(result, 2,function(secondResult){
+      addCb(result, 2,function(secondResult){
         console.log(secondResult);
-        add(secondResult, 2, function(fianlResult){
+        addCb(secondResult, 2, function(fianlResult){
           console.log(fianlResult);
         });
       });
     });
-    */
   </script>
 </head>
 <body>
