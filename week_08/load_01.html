@@ -17,6 +17,8 @@
       promise
       async/await
     */
+    /*
+    // Promise 作法
     function loadResources(){
       loadImage('./training99/smoke.png')
       .then(function(){
@@ -27,6 +29,14 @@
         console.log('Start Game');
       });
     };
+    */
+    // Async Await 作法
+    async function loadResources(){
+      await loadImage('./training99/smoke.png');
+      await loadImage('./training99/explosion.png');
+      await loadImage('./training99/plane.png');
+      console.log('Start Game');
+    }
     /*
     function loadImage(src){
       let img = new Image();
