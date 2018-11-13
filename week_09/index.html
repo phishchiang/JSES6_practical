@@ -36,7 +36,7 @@
     // 載入圖片資源
     async function loadImages(){
       let loading = document.querySelector('#loading');
-
+      // 物件的 Loop :
       // for (變數 in 物件)
       // 物件.成員名稱  或是  物件["成員名稱"] res.img = res["img"]
       for(let key in res.img){
@@ -72,7 +72,7 @@
       document.addEventListener('keyup', keyup);
       // 初始化遊戲相關的資料
       game.plane = new lib.Plane();
-      game.drawables=[game.plane];
+      game.drawables=[game.plane]; // game.drawables 是陣列的原因是方便下面使用 for Loop 去做 update
       // 啟動遊戲
       window.setInterval(refreshGame, 10);
       // 切換 HTML 的選單
