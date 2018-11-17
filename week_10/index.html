@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Training 99 Game</title>
+  <script src='lib.js'></script>
+  <script>
+    let ctx;
+    let res = {
+      total:3,
+      loaded:0,
+      img:{
+        plane:'../week_08/training99/plane.png',
+        explosion:'../week_08/training99/explosion.png',
+        smoke:'../week_08/training99/smoke.png',
+      }
+    };
+    let game={
+      id:null, // 排成編號
+      circle:null, // 回合數
+      over:null, // Game over 的紀錄
+      plane:null, // 重要東西 給他很高的地位
+      drawables:null,
+      key:{ // 紀錄遊戲中 追蹤有興趣的使用者鍵盤
+        left:false,
+        up:false,
+        right:false,
+        down:false,
+        a:false, // 空白建有一些問題，可能跟 Chome 版本有關
+      },
+    };
+
+    window.addEventListener('load', function(){
+      ctx = document.querySelector('#cvs').getContext('2d');
+      loadImages();
+    });
+    // 載入圖片資源
+    async function loadImages(){
+      let loading = document.querySelector('#loading');
+      // 物件的 Loop :
+      // for (變數 in 物件)
+      // 物件.成員名稱  或是  物件["成員名稱"] res.img = res["img"]
+      for(let key in res.img){
+        // console.log(key, res.img[key])
+        // res.img[name] 直接覆蓋掉本來的物件，取代本來的路徑字串
+        res.img[key] = await loadImage(res.img[key]);
+        res.loaded++;
+        let percentage = res.loaded/res.total*100;
+        console.log(percentage);
+        loading.innerHTML = percentage+'%';
+      }
+      initMenu();
+    }
+      function loadImage(src){
+        return new Promise(function(resolve, reject){
+          let img = new Image();
+          img.src = src;
+          img.addEventListener('load', function(){
+            // console.log('loaded', src);
+            resolve(img); // 如果順利，就呼叫resolve
+          });
+        });
+      }
+    function initMenu(){
+      // 切換 HTML 的選單
+      document.querySelector('#loading').style.display='none';
+      document.querySelector('#menu').style.display='block';
+      document.querySelector('#game').style.display='none';
+    }
+    function initGame(){
+      // 移除重新開始的動作
+      ctx.canvas.removeEventListener('click', initGame);
+      // 初始化鍵盤追蹤
+      game.key={ 
+        left:false,
+        up:false,
+        right:false,
+        down:false,
+        a:false, 
+      }
+      // 建立鍵盤操作介面
+      document.addEventListener('keydown', keydown);
+      document.addEventListener('keyup', keyup);
+      // 初始化遊戲相關的資料
+      game.circle = 0;
+      game.over = false;
+      game.plane = new lib.Plane();
+      game.bulletSystem = new lib.BulletSystem();
+      game.drawables=[game.plane, game.bulletSystem]; // game.drawables 是陣列的原因是方便下面使用 for Loop 去做 update
+      // 啟動遊戲，紀錄排程編號
+      game.id = window.setInterval(refreshGame, 10);
+      // 切換 HTML 的選單
+      document.querySelector('#menu').style.display='none';
+      document.querySelector('#game').style.display='block';
+    }
+      function keydown(e){
+        // console.log(e.keyCode);
+        let code = e.keyCode;
+        if(code==37){ // left
+          // 這邊觸發鍵盤事件的方式要調整，太底層了是作業系統的問題，變化狀態作法比較常見
+          // game.plane.x-=8; 
+          game.key.left = true;
+        }else if(code==38){ // up
+          // game.plane.y-=8;
+          game.key.up = true;
+        }else if(code==39){ // right
+          // game.plane.x+=8;
+          game.key.right = true;
+        }else if(code==40){ // down
+          // game.plane.y+=8;
+          game.key.down = true;
+        }else if(code==65){ // a
+          // game.plane.y+=8;
+          game.key.a = true;
+        }
+      }
+      function keyup(e){
+        // console.log(e.keyCode);
+        let code = e.keyCode;
+        if(code==37){ // left
+          game.key.left = false;
+        }else if(code==38){ // up
+          game.key.up = false;
+        }else if(code==39){ // right
+          game.key.right = false;
+        }else if(code==40){ // down
+          game.key.down = false;
+        }else if(code==65){ // a
+          game.key.a = false;
+        }
+      }
+    function refreshGame(){
+      let ds = game.drawables;
+      // 更新資料
+      for (let i=0; i<ds.length; i++){
+        if(ds[i].update()){
+          ds.splice(i, 1);
+          i--;
+        }
+      }
+      // 清空畫面
+      ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      // 重畫
+      for (let i=0; i<ds.length; i++){
+        ds[i].draw();
+      }
+      // 更新回合數
+      game.circle++;
+      // console.log(game.circle);
+      // 遊戲結束
+      if(game.over){
+        endGame();
+      }
+    }
+    function endGame(){
+      // 畫上爆炸圖
+      ctx.drawImage(res.img.explosion, 
+        game.plane.x-20, game.plane.y-20, 40, 40);
+      // 計算時間
+      let seconds = game.circle/100;
+      // 畫出來
+      ctx.save();
+      ctx.fillStyle = 'white';
+      ctx.globalAlpha = 0.5;
+      ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      ctx.globalAlpha = 1;
+      ctx.fillStyle='black';
+      ctx.font = '24px sans-serif'; // 設定文字樣式 : 和CSS的font屬性一樣
+      ctx.fillText('Game Over!! ' +seconds +' s', ctx.canvas.width/2-50, ctx.canvas.height/2);
+      ctx.restore();
+      //移除鍵盤操作介面
+      document.removeEventListener('keydown', keydown);
+      document.removeEventListener('keyup', keyup);
+      // 結束遊戲
+       window.clearInterval(game.id);
+      //  加入重新開始的功能
+      ctx.canvas.addEventListener('click', initGame);
+    }
+  </script>
+</head>
+<body>
+  <h3>Game</h3>
+  <div id='loading'>loading</div>
+  <div id='menu' style='display:none'>
+    <button onclick="initGame();">Start Game</button>
+  </div>
+  <div id='game' style='display:none'>
+    <canvas id='cvs' width='600' height='450'></canvas>
+  </div>
+</body>
+</html>
