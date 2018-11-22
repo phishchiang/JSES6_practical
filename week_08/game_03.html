@@ -40,10 +40,12 @@
       // 初始化資料
       this.x=100;
       this.y=100;
-      this.vx=1;
-      this.vy=Math.random()*1;
+      this.vx=0.1; // velocity
+      this.ax=0.001; // acceleration
+      this.vy=Math.random()*0.1;
 
       this.update = function(){
+        this.vx = this.vx + this.ax;
         this.x = this.x + this.vx;
         this.y = this.y + this.vy;
         // 每一個物件自己回報，回傳一個布林值，告訴主程式這個物件是否已經可以刪除
